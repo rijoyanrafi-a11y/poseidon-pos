@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌊 Poseidon Dive Center POS</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      margin: 0; 
+      background: linear-gradient(135deg, #0c4a6e, #1e3a8a); 
+      color: white; 
+    }
+    .container { 
+      max-width: 1000px; 
+      margin: 20px auto; 
+      padding: 25px; 
+      background: rgba(255,255,255,0.1); 
+      border-radius: 16px; 
+      backdrop-filter: blur(10px); 
+    }
+    h1 { text-align: center; margin-bottom: 5px; }
+    h2 { text-align: center; margin-bottom: 20px; color: #60a5fa; }
+    input, select, button { 
+      width: 100%; 
+      padding: 12px; 
+      margin: 8px 0; 
+      border: none; 
+      border-radius: 8px; 
+      font-size: 16px; 
+    }
+    button { 
+      background: #22c55e; 
+      color: black; 
+      font-weight: bold; 
+      cursor: pointer; 
+      font-size: 17px; 
+    }
+    button:hover { background: #16a34a; }
+    .red-btn { background: #ef4444; }
+    .red-btn:hover { background: #dc2626; }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin: 15px 0; 
+      background: rgba(255,255,255,0.1); 
+    }
+    th, td { 
+      padding: 12px; 
+      text-align: left; 
+      border-bottom: 1px solid #ddd; 
+    }
+    .total { 
+      font-size: 28px; 
+      font-weight: bold; 
+      text-align: center; 
+      color: #fde047; 
+      margin: 20px 0; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌊 POSEIDON DIVE CENTER</h1>
+    <h2>Diving Equipment Rental POS</h2>
+
+    <h3>Customer Information</h3>
+    <input type="text" id="name" placeholder="Customer Full Name">
+    <input type="text" id="mobile" placeholder="Mobile Number">
+    <input type="text" id="nid" placeholder="National ID / Passport">
+    <input type="text" id="instructor" placeholder="Instructor Name">
+
+    <h3>Add Equipment</h3>
+    <select id="item">
+      <option value="30">BCD - 30 SAR/day</option>
+      <option value="20">Mask - 20 SAR/day</option>
+      <option value="20">Fins - 20 SAR/day</option>
+      <option value="35">Regulator - 35 SAR/day</option>
+      <option value="40">Wetsuit - 40 SAR/day</option>
+      <option value="150">Boat - 150 SAR/day</option>
+    </select>
+    <input type="number" id="days" value="1" min="1" placeholder="Number of Days">
+    <input type="number" id="qty" value="1" min="1" placeholder="Quantity">
+    <button onclick="addItem()">➕ Add to Cart</button>
+
+    <h3>Current Cart</h3>
+    <table id="cartTable">
+      <tr><th>Item</th><th>Qty</th><th>Days</th><th>Amount (SAR)</th></tr>
+    </table>
+
+    <div class="total" id="total">Total: 0 SAR</div>
+
+    <button onclick="generateInvoice()" style="background:#eab308; font-size:18px;">💰 Generate & Print Invoice</button>
+    <button onclick="clearCart()" class="red-btn">🗑️ Clear Cart</button>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addItem() {
+      const select = document.getElementById('item');
+      const itemName = select.options[select.selectedIndex].text.split(' -')[0];
+      const price = parseFloat(select.value);
+      const days = parseInt(document.getElementById('days').value);
+      const qty = parseInt(document.getElementById('qty').value);
+      const amount = price * days * qty;
+
+      cart.push({item: itemName, qty: qty, days: days, amount: amount});
+      renderCart();
+    }
+
+    function renderCart() {
+      let html = `<tr><th>Item</th><th>Qty</th><th>Days</th><th>Amount (SAR)</th></tr>`;
+      let total = 0;
+      cart.forEach(item => {
+        html += `<tr><td>${item.item}</td><td>${item.qty}</td><td>${item.days}</td><td>${item.amount}</td></tr>`;
+        total += item.amount;
+      });
+      document.getElementById('cartTable').innerHTML = html;
+      document.getElementById('total').innerHTML = `Total: ${total} SAR`;
+    }
+
+    function generateInvoice() {
+      const name = document.getElementById('name').value || "Customer";
+      const mobile = document.getElementById('mobile').value || "";
+      const date = new Date().toLocaleDateString('en-GB');
+      const invoiceNo = "INV-" + Date.now().toString().slice(-8);
+
+      let text = `POSEIDON DIVE CENTER\nInvoice #: ${invoiceNo}\nDate: ${date}\nCustomer: ${name}\nMobile: ${mobile}\n\n`;
+      text += `Item\tQty\tDays\tAmount\n----------------------------------\n`;
+
+      let total = 0;
+      cart.forEach(item => {
+        text += `${item.item}\t${item.qty}\t${item.days}\t${item.amount} SAR\n`;
+        total += item.amount;
+      });
+
+      text += `\nTotal Amount: ${total} SAR\n\nCustomer Signature: __________\nThank You!`;
+
+      alert(text);
+      window.print();
+    }
+
+    function clearCart() {
+      if(confirm("সব ক্লিয়ার করবেন?")) {
+        cart = [];
+        renderCart();
+      }
+    }
+  </script>
+</body>
+</html>
